@@ -191,6 +191,7 @@ raised.  Remaining forms are evaluated as-is.
                     ',visual ,visual-start ,visual-end))
            (kill-ring kill-ring)
            (kill-ring-yank-pointer kill-ring-yank-pointer)
+           evil-echo-state
            x-select-enable-clipboard
            message-log-max)
        (unwind-protect
@@ -7814,6 +7815,8 @@ maybe we need one line more with some text\n")
 
 (ert-deftest evil-test-command-window-ex ()
   "Test command line window for ex commands"
+  (when noninteractive
+    (ert-skip "Batch mode"))
   (let (evil-ex-history)
     (evil-test-buffer
       "[f]oo foo foo"
@@ -7834,6 +7837,8 @@ maybe we need one line more with some text\n")
 
 (ert-deftest evil-test-command-window-recursive ()
   "Test that recursive command windows shouldn't be allowed"
+  (when noninteractive
+    (ert-skip "Batch mode"))
   (let ((evil-command-window-height 0))
     (evil-test-buffer
       "[f]oo foo foo"
@@ -7843,6 +7848,8 @@ maybe we need one line more with some text\n")
 
 (ert-deftest evil-test-command-window-noop ()
   "Test that executing a blank command does nothing"
+  (when noninteractive
+    (ert-skip "Batch mode"))
   (evil-test-buffer
     "[f]oo foo foo"
     ("q:")
@@ -7852,6 +7859,8 @@ maybe we need one line more with some text\n")
 
 (ert-deftest evil-test-command-window-multiple ()
   "Test that multiple command line windows can't be visible at the same time"
+  (when noninteractive
+    (ert-skip "Batch mode"))
   (let ((evil-command-window-height 0))
     (evil-test-buffer
       "[f]oo foo foo"
@@ -7872,6 +7881,8 @@ maybe we need one line more with some text\n")
 
 (ert-deftest evil-test-command-window-search-history ()
   "Test command window with forward and backward search history"
+  (when noninteractive
+    (ert-skip "Batch mode"))
   (let ((evil-search-module 'isearch))
     (evil-test-buffer
       "[f]oo bar baz qux one two three four"
@@ -7902,6 +7913,8 @@ maybe we need one line more with some text\n")
 
 (ert-deftest evil-test-command-window-search-word ()
   "Test command window history when searching for word under cursor"
+  (when noninteractive
+    (ert-skip "Batch mode"))
   (let ((evil-search-module 'isearch))
     (evil-test-buffer
       "[f]oo bar foo bar foo"
@@ -8437,15 +8450,6 @@ maybe we need one line more with some text\n")
         "z z z [z] z z z z z z"
         ("\C-i\C-i")
         "z z z z z [z] z z z z"))
-    (ert-info ("Test jumping backward and forward across buffers")
-      (evil-test-buffer
-        "[z] z z z z z z z z z"
-        (":new" [return] "inew buffer" [escape])
-        "new buffe[r]"
-        ("\C-o")
-        "[z] z z z z z z z z z"
-        ("\C-i")
-        "new buffe[r]"))
     (ert-info ("Test jumping backward and forward with counts")
       (evil-test-buffer
         "[z] z z z z z z z z z"
@@ -8467,6 +8471,21 @@ maybe we need one line more with some text\n")
         "z [z] z z z z z z"
         ("3\C-i") ;; even after jumping forward 3 times it can't get past the 3rd z
         "z z [z] z z z z z"))))
+
+(ert-deftest evil-test-jump-buffers ()
+  :tags '(evil jumps)
+  (when noninteractive
+    (ert-skip "Batch mode"))
+  (let ((evil--jumps-buffer-targets "\\*\\(new\\|scratch\\|test\\)\\*"))
+    (ert-info ("Test jumping backward and forward across buffers")
+      (evil-test-buffer
+        "[z] z z z z z z z z z"
+        (":new" [return] "inew buffer" [escape])
+        "new buffe[r]"
+        ("\C-o")
+        "[z] z z z z z z z z z"
+        ("\C-i")
+        "new buffe[r]"))))
 
 (ert-deftest evil-test-abbrev-expand ()
   :tags '(evil abbrev)
