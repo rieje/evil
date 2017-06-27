@@ -519,6 +519,7 @@ Based on `evil-enclose-ace-jump-for-motion'."
 (evil-define-avy-motion avy-goto-word-1-below exclusive)
 (evil-define-avy-motion avy-goto-subword-0 exclusive)
 (evil-define-avy-motion avy-goto-subword-1 exclusive)
+(evil-define-avy-motion avy-goto-char-timer inclusive)
 
 ;; remap avy-* commands to evil-avy-* commands
 (dolist (command '(avy-goto-word-or-subword-1
